@@ -62,14 +62,18 @@ def login_failed():
 def view_topic(topic_id):
     threads = PostDAO(db).get_thread_list(topic_id)
     username = session.get_user_id() #name would be better
-    topic_name = PostDAO(db).get_topic_by_id(topic_id).name
-    return render_template("topic.html", threads=threads, topic_id=topic_id, username = username, topic_name = topic_name)
+    topic = PostDAO(db).get_topic_by_id(topic_id)
+    if topic == None:
+        return display_error("Virheellinen keskustelualue!","")
+    return render_template("topic.html", threads=threads, topic_id=topic_id, username = username, topic_name = topic.name)
 
 
 @app.route("/thread/<int:thread_id>")
 def view_thread(thread_id):
     dao = PostDAO(db)
     posts = dao.get_posts_by_thread(thread_id)
+    if len(posts) == 0:
+        return display_error("Virheellinen keskusteluketju!", "")
     thread_name = dao.get_thread_name(thread_id)
     topic = dao.get_thread_topic(thread_id)
     logged_in = session.get_session_user() != None

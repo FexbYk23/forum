@@ -14,7 +14,7 @@ class PostDAO:
     def get_posts_by_thread(self, thread_id):
         """Returns a list of Post objects in thread"""
 
-        sql = "SELECT * FROM posts WHERE thread=:thread_id"
+        sql = "SELECT * FROM posts WHERE thread=:thread_id and is_deleted is not TRUE"
         result = self.__db.session.execute(sql, {"thread_id":thread_id})
         posts = result.fetchall()
         post_list = []
@@ -58,9 +58,11 @@ class PostDAO:
         return thread_id
 
     def get_topic_by_id(self, topic_id):
-        sql = "SELECT id, name FROM topics WHERE id=:id"
+        sql = "SELECT id, name, is_deleted FROM topics WHERE id=:id"
         result = self.__db.session.execute(sql, {"id":topic_id})
         t = result.fetchone()
+        if t == None or t[2]:    #is_deleted = 1
+            return None
         return Topic(t[0], t[1])
 
     def get_thread_post_count(self, thread_id):
@@ -72,7 +74,6 @@ class PostDAO:
         "(SELECT COUNT(P.id) FROM posts P WHERE P.thread=T.id)"\
         "FROM threads T WHERE topic=:topic"
         result = self.__db.session.execute(sql, {"topic":topic_id}).fetchall()
-        print(result)
         return [Thread(x[0],x[1],x[2]) for x in result]
 
     def create_topic(self, topic_name, topic_desc):
