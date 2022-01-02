@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="/static/style.css">
+<title>ketju</title>
+
+
+<p>
+<a href="/">Etusivu</a> /
+<a href={{topic.url}}>{{ topic.name }}</a> /
+{{ thread_name }}
+</p>
+
+
+<p><h1>{{ thread_name }}</h1></p>
+
+{% for post in posts %}
+<div id="post-body">
+	<p id="post-header"> {{ post.poster }} Kirjoitti {{ post.time }}:</p>
+	<p id="post-msg">{{ post.content }}</p>
+</div>
+<br>
+{% endfor %}
+
+<h2>Uusi viesti</h2>
+
+<form action="/create_post/{{ thread_id }}" method="POST">
+	<textarea name="message" rows="4" cols="40"></textarea>
+	<br>
+	<input type="submit" value="Lähetä">
+</form>

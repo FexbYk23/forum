@@ -1,0 +1,28 @@
+<title>Ketjut</title>
+
+<a href="/">Etusivu</a> /
+{{ topic_name }}
+
+<h2>Keskustelut:</h2>
+
+{% for thread in threads %}
+<a href="/thread/{{thread.id}}"
+<p>{{ thread.name }}</p>
+</a>
+<p>Viestejä: {{ thread.posts }}</p>
+{% endfor %}
+
+
+{% if username != None %}
+<h2>Uusi keskusteluketju</h2>
+<form action="/create_thread/{{topic_id}}" method="post">
+	Otsikko:
+	<input type="text" name="thread_name">
+	<br>
+	Aloitusviesti:
+	<br>
+	<textarea name="message" rows="4" cols="40"></textarea>
+	<br>
+	<input type="submit" value="Luo keskusteluketju">
+</form>
+{% endif %}
