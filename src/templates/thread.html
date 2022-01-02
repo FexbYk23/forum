@@ -19,6 +19,8 @@
 <br>
 {% endfor %}
 
+
+{% if logged_in %}
 <h2>Uusi viesti</h2>
 
 <form action="/create_post/{{ thread_id }}" method="POST">
@@ -26,3 +28,6 @@
 	<br>
 	<input type="submit" value="Lähetä">
 </form>
+{% else %}
+<p>Osallistu keskusteluun kirjautumalla sisään.</p>
+{% endif %}

@@ -73,7 +73,9 @@ def view_thread(thread_id):
     posts = dao.get_posts_by_thread(thread_id)
     thread_name = dao.get_thread_name(thread_id)
     topic = dao.get_thread_topic(thread_id)
-    return render_template("thread.html",  posts=posts, thread_name=thread_name, thread_id=thread_id, topic=topic)
+    logged_in = session.get_session_user() != None
+    return render_template("thread.html",  posts=posts, thread_name=thread_name, thread_id=thread_id,
+            topic=topic, logged_in=logged_in)
 
 @app.route("/create_post/<int:thread_id>", methods=["POST"])
 def post_in_thread(thread_id):
