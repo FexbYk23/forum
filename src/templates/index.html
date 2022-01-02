@@ -30,11 +30,26 @@
 <p><i>{{ topic.description }}</i></p>
 
 {% if is_admin %}
-<p> Poista </p>
+<form action="/delete_topic/{{ topic.id }}" method="POST">
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+	<input type="submit" value="Poista">
+</form>
 {% endif %}
 
 {% endfor %}
 
+
 {% if is_admin %}
 <h1>Luo uusi keskustelualue</h1>
+<form action="/create_topic" method="POST">
+	Nimi:
+	<input type="text" name="name">
+	<br>
+	Kuvaus:
+	<input type="text" name="desc">
+	<br>
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+	<input type="submit" value="Luo keskustelualue">
+</form>
 {% endif %}
+

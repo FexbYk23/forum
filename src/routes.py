@@ -1,6 +1,6 @@
 from app import app
 from db import db
-from flask import redirect, render_template, request, session
+from flask import redirect, render_template, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from post_dao import PostDAO
 
@@ -11,10 +11,18 @@ import session
 def display_error(desc, msg):
     return render_template("error.html", error_name=desc, error_msg=msg)
 
+def verify_csrf():
+    if not session.check_csrf_token(request.form["csrf_token"]):
+        abort(403)
+
+def verify_user_is_admin():
+    if not user.is_user_admin(session.get_session_user()):
+        abort(403)
+
 @app.route("/")
 def index():
     username = session.get_session_user()
-    topics = db.session.execute("SELECT * FROM topics").fetchall()
+    topics = db.session.execute("SELECT * FROM topics WHERE is_deleted=FALSE").fetchall()
     return render_template("index.html", user=username, topics=topics, is_admin=user.is_user_admin(username))
 
 
@@ -94,3 +102,21 @@ def create_new_thread(topic_id):
 
     thread_id = dao.create_thread_with_post(thread_name, message, user_id, topic_id)
     return redirect("/thread/" + str(thread_id))
+
+
+@app.route("/delete_topic/<int:id>", methods=["POST"])
+def delete_topic(id):
+    verify_csrf()
+    verify_user_is_admin()
+    PostDAO(db).delete_topic(id)
+    return redirect("/")
+
+@app.route("/create_topic", methods=["POST"])
+def create_topic():
+    verify_csrf()
+    verify_user_is_admin()
+    topic_name = request.form["name"]
+    topic_description = request.form["desc"]
+    PostDAO(db).create_topic(topic_name, topic_description)
+    return redirect("/")
+

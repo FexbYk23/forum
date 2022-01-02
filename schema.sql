@@ -1,7 +1,7 @@
 
 CREATE TABLE users (
 	id SERIAL PRIMARY KEY,
-	name UNIQUE TEXT,
+	name TEXT UNIQUE,
 	password_hash TEXT,
 	is_admin BOOLEAN
 );

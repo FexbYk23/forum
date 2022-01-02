@@ -70,4 +70,12 @@ class PostDAO:
         sql = "SELECT id, name FROM threads WHERE topic=:topic"
         result = self.__db.execute(sql, {"topic":topic_id}).fetchall()
 
+    def create_topic(self, topic_name, topic_desc):
+        sql = "INSERT INTO topics VALUES (DEFAULT, :name, :desc, FALSE)"
+        self.__db.session.execute(sql, {"name":topic_name, "desc":topic_desc})
+        self.__db.session.commit()
 
+    def delete_topic(self, topic_id):
+        sql = "UPDATE topics SET is_deleted=TRUE WHERE id=:id"
+        self.__db.session.execute(sql, {"id":topic_id})
+        self.__db.session.commit()
