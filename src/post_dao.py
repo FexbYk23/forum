@@ -1,5 +1,6 @@
 from domain.post import Post
 from domain.topic import Topic
+from domain.thread import Thread
 from user import get_user_list
 
 class PostDAO:
@@ -67,8 +68,12 @@ class PostDAO:
         return self.__db.session.execute(sql, {"id":thread_id}).fetchone()[0]
 
     def get_thread_list(self, topic_id):
-        sql = "SELECT id, name FROM threads WHERE topic=:topic"
-        result = self.__db.execute(sql, {"topic":topic_id}).fetchall()
+        sql = "SELECT T.id, T.name, "\
+        "(SELECT COUNT(P.id) FROM posts P WHERE P.thread=T.id)"\
+        "FROM threads T WHERE topic=:topic"
+        result = self.__db.session.execute(sql, {"topic":topic_id}).fetchall()
+        print(result)
+        return [Thread(x[0],x[1],x[2]) for x in result]
 
     def create_topic(self, topic_name, topic_desc):
         sql = "INSERT INTO topics VALUES (DEFAULT, :name, :desc, FALSE)"

@@ -60,8 +60,7 @@ def login_failed():
 
 @app.route("/topics/<int:topic_id>")
 def view_topic(topic_id):
-    result = db.session.execute("SELECT * FROM threads WHERE topic=:tid", {"tid":topic_id})
-    threads = result.fetchall()
+    threads = PostDAO(db).get_thread_list(topic_id)
     username = session.get_user_id() #name would be better
     topic_name = PostDAO(db).get_topic_by_id(topic_id).name
     return render_template("topic.html", threads=threads, topic_id=topic_id, username = username, topic_name = topic_name)
