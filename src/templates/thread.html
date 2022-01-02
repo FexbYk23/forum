@@ -26,6 +26,7 @@
 <form action="/create_post/{{ thread_id }}" method="POST">
 	<textarea name="message" rows="4" cols="40"></textarea>
 	<br>
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 	<input type="submit" value="Lähetä">
 </form>
 {% else %}

@@ -79,6 +79,7 @@ def view_thread(thread_id):
 
 @app.route("/create_post/<int:thread_id>", methods=["POST"])
 def post_in_thread(thread_id):
+    verify_csrf()
     dao = PostDAO(db)
     user_id = session.get_user_id()
     message = request.form["message"]
@@ -88,6 +89,7 @@ def post_in_thread(thread_id):
 
 @app.route("/create_thread/<int:topic_id>", methods=["POST"])
 def create_new_thread(topic_id):
+    verify_csrf()
     dao = PostDAO(db)
 
     thread_name = request.form["thread_name"]
