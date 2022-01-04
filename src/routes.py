@@ -6,7 +6,7 @@ from post_dao import PostDAO
 
 import user
 import session
-
+import thread_db
 
 def display_error(desc, msg):
     return render_template("error.html", error_name=desc, error_msg=msg)
@@ -60,7 +60,7 @@ def login_failed():
 
 @app.route("/topics/<int:topic_id>")
 def view_topic(topic_id):
-    threads = PostDAO(db).get_thread_list(topic_id)
+    threads = thread_db.get_thread_list(topic_id)
     username = session.get_user_id() #name would be better
     topic = PostDAO(db).get_topic_by_id(topic_id)
     if topic == None:
@@ -74,8 +74,8 @@ def view_thread(thread_id):
     posts = dao.get_posts_by_thread(thread_id)
     if len(posts) == 0:
         return display_error("Virheellinen keskusteluketju!", "")
-    thread_name = dao.get_thread_name(thread_id)
-    topic = dao.get_thread_topic(thread_id)
+    thread_name = thread_db.get_thread_name(thread_id)
+    topic = thread_db.get_thread_topic(thread_id)
     logged_in = session.get_session_user() != None
     return render_template("thread.html",  posts=posts, thread_name=thread_name, thread_id=thread_id,
             topic=topic, logged_in=logged_in)
@@ -102,7 +102,6 @@ def post_in_thread(thread_id):
 @app.route("/create_thread/<int:topic_id>", methods=["POST"])
 def create_new_thread(topic_id):
     verify_csrf()
-    dao = PostDAO(db)
 
     thread_name = request.form["thread_name"]
     message = request.form["message"]
@@ -116,7 +115,7 @@ def create_new_thread(topic_id):
     if user_id == None:
         return display_error("Vain rekisteröityneet käyttäjät voivat tehdä viestiketjuja", "")
 
-    thread_id = dao.create_thread_with_post(thread_name, message, user_id, topic_id)
+    thread_id = thread_db.create_thread_with_post(thread_name, message, user_id, topic_id)
     return redirect("/thread/" + str(thread_id))
 
 
