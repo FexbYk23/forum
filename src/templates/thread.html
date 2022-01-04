@@ -23,8 +23,13 @@
 {% if logged_in %}
 <h2>Uusi viesti</h2>
 
-<form action="/create_post/{{ thread_id }}" method="POST">
+<form action="/create_post/{{ thread_id }}" method="POST" enctype="multipart/form-data">
+	Viesti:
+	<br>
 	<textarea name="message" rows="4" cols="40"></textarea>
+	<br>
+	Upotettava tiedosto:
+	<input type="file" id="postfile" name="post_file">
 	<br>
 	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 	<input type="submit" value="Lähetä">

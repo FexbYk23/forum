@@ -47,10 +47,27 @@ class PostDAO:
         return result.fetchone()[0] #ID
 
     def create_post(self, thread_id, post_text, user_id):
-        sql = "INSERT INTO posts VALUES (DEFAULT, :text, :user_id, :thread_id, NOW())"
-        self.__db.session.execute(sql, {"text":post_text, "user_id":user_id, "thread_id":thread_id})
+        sql = "INSERT INTO posts VALUES (DEFAULT, :text, :user_id, :thread_id, NOW()) RETURNING id"
+        result = self.__db.session.execute(sql, {"text":post_text, "user_id":user_id, "thread_id":thread_id})
+        self.__db.session.commit()
+        return result.fetchone()[0] #id
+    
+    def create_file(self, filename, filedata):
+        sql = "INSERT INTO files VALUES (DEFAULT, :name, :url, :data, FALSE) RETURNING id"
+        subst = {"name" : filename, "url":filename, "data":filedata}
+        result = self.__db.session.execute(sql, subst)
+        self.__db.session.commit()
+        return result.fetchone()[0]
+                
+    def add_file_to_post(self, post_id, file_id):
+        sql = "INSERT INTO file_to_post VALUES (:file_id, :post_id)"
+        self.__db.session.execute(sql, {"file_id":file_id, "post_id":post_id})
         self.__db.session.commit()
 
+    def create_post_with_file(self, thread_id, post_text, user_id, filename, filedata):
+        post_id = self.create_post(thread_id, post_text, user_id)
+        file_id = self.create_file(filename, filedata)
+        self.add_file_to_post(post_id, file_id)
 
     def create_thread_with_post(self, thread_name, post_text, user_id, topic_id):
         thread_id = self.create_thread(topic_id, thread_name)

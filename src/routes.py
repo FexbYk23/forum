@@ -86,8 +86,16 @@ def post_in_thread(thread_id):
     dao = PostDAO(db)
     user_id = session.get_user_id()
     message = request.form["message"]
+    file = request.files["post_file"]
+    filedata = file.read()
+    if len(filedata) > 1024*1024:
+        return display_error("Tiedosto on liian suuri", "Tiedosto saa olla enintään 1MB kokoinen")
+
     if user_id != None and len(message) > 0:
-        dao.create_post(thread_id, message, user_id)
+        if len(filedata) > 0:
+            dao.create_post_with_file(thread_id, message, user_id, file.name, filedata)
+        else:
+            dao.create_post(thread_id, message, user_id)
     return redirect("/thread/" + str(thread_id))
 
 @app.route("/create_thread/<int:topic_id>", methods=["POST"])

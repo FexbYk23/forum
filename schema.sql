@@ -36,3 +36,8 @@ CREATE TABLE files (
 	data BYTEA,
 	is_deleted BOOLEAN
 );
+
+CREATE TABLE file_to_post (
+	file_id INTEGER REFERENCES files,
+	post_id INTEGER REFERENCES posts
+);
