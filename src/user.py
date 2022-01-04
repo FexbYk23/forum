@@ -36,17 +36,10 @@ def is_user_admin(username):
     sql = "SELECT 1 FROM users WHERE name=:name AND is_admin=TRUE"
     return  db.session.execute(sql, {"name":username}).fetchone()
 
-def create_account(user, pass1, pass2):
-    if len(user) == 0 or len(pass1) == 0:
-        return False
-
-    if pass1 != pass2:
-        return False
-    
+def create_account(user, password,):
     if does_user_exist(user):
         return False
-
-    add_user(user, generate_password_hash(pass1))
+    add_user(user, generate_password_hash(password))
     return True
 
 

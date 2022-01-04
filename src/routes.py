@@ -7,6 +7,7 @@ from post_dao import PostDAO
 import user
 import session
 import thread_db
+import input_validation
 
 def display_error(desc, msg):
     return render_template("error.html", error_name=desc, error_msg=msg)
@@ -29,10 +30,18 @@ def index():
 @app.route("/register", methods=["POST", "GET"])
 def register():
     if request.method == "POST":
-        if user.create_account(request.form["username"], request.form["password"], request.form["password2"]):
+        username = request.form["username"]
+        pass1 = request.form["password"]
+        pass2 = request.form["password2"]
+        
+        valid = input_validation.is_registration_valid(username, pass1, pass2)
+        if not valid[0]:
+            return display_error("Rekisteröityminen epäonnistui",valid[1])
+
+        if user.create_account(username, pass1):
             session.login_as(request.form["username"])
             return redirect("/")
-        return display_error("Rekisteröityminen epäonnistui", "")
+        return display_error("Rekisteröityminen epäonnistui", "nimi on jo käytössä")
     
     elif request.method == "GET":
         return render_template("register.html")
@@ -90,13 +99,15 @@ def post_in_thread(thread_id):
     filedata = file.read()
     if len(filedata) > 1024*1024:
         return display_error("Tiedosto on liian suuri", "Tiedosto saa olla enintään 1MB kokoinen")
-    print("tiedoston nimi:",file.name)
+    
+    valid = input_validation.is_post_valid(user_id, message)
+    if not valid[0]:
+        return display_error(valid[1], "")
 
-    if user_id != None and len(message) > 0:
-        if len(filedata) > 0:
-            dao.create_post_with_file(thread_id, message, user_id, file.filename, filedata)
-        else:
-            dao.create_post(thread_id, message, user_id)
+    if len(filedata) > 0:
+        dao.create_post_with_file(thread_id, message, user_id, file.filename, filedata)
+    else:
+        dao.create_post(thread_id, message, user_id)
     return redirect("/thread/" + str(thread_id))
 
 @app.route("/create_thread/<int:topic_id>", methods=["POST"])
@@ -106,14 +117,14 @@ def create_new_thread(topic_id):
     thread_name = request.form["thread_name"]
     message = request.form["message"]
     user_id = session.get_user_id()
-    if len(message) == 0:
-        return display_error("Viestiketjun luonti epäonnistui", "Aloitusviesti ei saa olla tyhjä")
-
-    if len(thread_name) == 0:
-        return display_error("Viestiketjun luonti epäonnistui", "Viestiketjun nimi ei saa olla tyhjä")
     
-    if user_id == None:
-        return display_error("Vain rekisteröityneet käyttäjät voivat tehdä viestiketjuja", "")
+    post_valid = input_validation.is_post_valid(user_id, message)
+    if not post_valid[0]:
+        return display_error(post_valid[1],"")
+
+    thread_valid = input_validation.is_thread_name_valid(thread_name)
+    if not thread_valid[0]:
+        return display_error(thread_valid[1],"")
 
     thread_id = thread_db.create_thread_with_post(thread_name, message, user_id, topic_id)
     return redirect("/thread/" + str(thread_id))
