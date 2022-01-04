@@ -32,7 +32,6 @@ CREATE TABLE posts (
 CREATE TABLE files (
 	id SERIAL PRIMARY KEY,
 	name TEXT,
-	url TEXT,
 	data BYTEA,
 	is_deleted BOOLEAN
 );

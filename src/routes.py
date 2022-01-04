@@ -1,6 +1,6 @@
 from app import app
 from db import db
-from flask import redirect, render_template, request, session, abort
+from flask import redirect, render_template, request, session, abort, make_response
 from flask_sqlalchemy import SQLAlchemy
 from post_dao import PostDAO
 
@@ -90,10 +90,11 @@ def post_in_thread(thread_id):
     filedata = file.read()
     if len(filedata) > 1024*1024:
         return display_error("Tiedosto on liian suuri", "Tiedosto saa olla enintään 1MB kokoinen")
+    print("tiedoston nimi:",file.name)
 
     if user_id != None and len(message) > 0:
         if len(filedata) > 0:
-            dao.create_post_with_file(thread_id, message, user_id, file.name, filedata)
+            dao.create_post_with_file(thread_id, message, user_id, file.filename, filedata)
         else:
             dao.create_post(thread_id, message, user_id)
     return redirect("/thread/" + str(thread_id))
@@ -134,4 +135,13 @@ def create_topic():
     topic_description = request.form["desc"]
     PostDAO(db).create_topic(topic_name, topic_description)
     return redirect("/")
+
+@app.route("/file/<int:id>/<string:filename>")
+def view_file(id, filename):
+    file = PostDAO(db).get_file(id)
+    if file == None:
+        return display_error("Virheellinen tiedosto", "hakemaasi tiedostoa ei ole olemassa")
+    response = make_response(file.data)
+    response.headers.set("Content-Type", file.get_mimetype())
+    return response
 

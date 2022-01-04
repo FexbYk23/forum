@@ -1,13 +1,9 @@
 
 class Post:
 
-    def __init__(self, text, poster, time):
+    def __init__(self, text, poster, time, file):
         self.content = text
         self.poster = poster
         self.time = time
+        self.file = file
 
-    def get_text(self):
-        return self.__text
-
-    def get_poster(self):
-        return self.__poster

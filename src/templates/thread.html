@@ -15,6 +15,14 @@
 <div id="post-body">
 	<p id="post-header"> {{ post.poster }} Kirjoitti {{ post.time }}:</p>
 	<p id="post-msg">{{ post.content }}</p>
+
+	{% if post.file != None %}
+		<p>
+			<i>
+				<a href="{{ post.file }}">Lataa liitetiedosto</a>
+			</i>
+		</p>
+	{% endif %}
 </div>
 <br>
 {% endfor %}

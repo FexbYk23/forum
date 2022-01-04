@@ -1,6 +1,7 @@
 from domain.post import Post
 from domain.topic import Topic
 from domain.thread import Thread
+from domain.file import File
 from user import get_user_list
 
 class PostDAO:
@@ -21,7 +22,8 @@ class PostDAO:
         user_list = get_user_list()
 
         for post in posts:
-            p = Post(post["content"], user_list[post["poster"]], post["time"])
+            file_url = self.get_post_file_url(post["id"])
+            p = Post(post["content"], user_list[post["poster"]], post["time"], file_url)
             post_list.append(p)
         return post_list
 
@@ -53,8 +55,8 @@ class PostDAO:
         return result.fetchone()[0] #id
     
     def create_file(self, filename, filedata):
-        sql = "INSERT INTO files VALUES (DEFAULT, :name, :url, :data, FALSE) RETURNING id"
-        subst = {"name" : filename, "url":filename, "data":filedata}
+        sql = "INSERT INTO files VALUES (DEFAULT, :name, :data, FALSE) RETURNING id"
+        subst = {"name" : filename, "data":filedata}
         result = self.__db.session.execute(sql, subst)
         self.__db.session.commit()
         return result.fetchone()[0]
@@ -68,6 +70,21 @@ class PostDAO:
         post_id = self.create_post(thread_id, post_text, user_id)
         file_id = self.create_file(filename, filedata)
         self.add_file_to_post(post_id, file_id)
+    
+    def get_file(self, file_id):
+        sql = "SELECT name,data FROM files WHERE id=:id AND is_deleted is not TRUE"
+        result = self.__db.session.execute(sql, {"id":file_id}).fetchone()
+        if result == None:
+            return None
+        return File(result[0], result[1])
+    
+    def get_post_file_url(self, post_id):
+        sql = "SELECT A.id, A.name FROM files A, file_to_post B WHERE B.post_id=:post" \
+        " AND B.file_id=A.id AND A.is_deleted is not TRUE"
+        result = self.__db.session.execute(sql, {"post":post_id}).fetchone()
+        if result == None:
+            return None
+        return f"/file/{result[0]}/{result[1]}"
 
     def create_thread_with_post(self, thread_name, post_text, user_id, topic_id):
         thread_id = self.create_thread(topic_id, thread_name)
