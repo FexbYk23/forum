@@ -83,6 +83,13 @@ def view_thread(thread_id):
     posts = dao.get_posts_by_thread(thread_id)
     if len(posts) == 0:
         return display_error("Virheellinen keskusteluketju!", "")
+    
+    username = session.get_session_user()
+    is_admin = user.is_user_admin(username)
+
+    for post in posts:
+        if post.poster == username or is_admin:
+            post.can_delete = True
     thread_name = thread_db.get_thread_name(thread_id)
     topic = thread_db.get_thread_topic(thread_id)
     logged_in = session.get_session_user() != None
@@ -154,4 +161,11 @@ def view_file(id, filename):
     response = make_response(file.data)
     response.headers.set("Content-Type", file.get_mimetype())
     return response
+
+
+@app.route("/delete_post/<int:id>", methods=["POST"])
+def delete_post(id):
+    print("deleting", id)
+    PostDAO(db).delete_post(id)
+    return redirect("/")
 

@@ -13,7 +13,16 @@
 
 {% for post in posts %}
 <div id="post-body">
-	<p id="post-header"> {{ post.poster }} Kirjoitti {{ post.time }}:</p>
+	<p id="post-header">
+		{{ post.poster }} Kirjoitti {{ post.time }}:
+		
+		{% if post.can_delete %}
+		<form action="/delete_post/{{ post.id }}" method="POST">
+			<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+			<input type="submit" value="Poista viesti">
+		</form>
+		{% endif %}
+	</p>
 	<p id="post-msg">{{ post.content }}</p>
 
 	{% if post.file != None %}

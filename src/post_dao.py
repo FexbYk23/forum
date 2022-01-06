@@ -20,7 +20,7 @@ class PostDAO:
 
         for post in posts:
             file_url = self.get_post_file_url(post["id"])
-            p = Post(post["content"], user_list[post["poster"]], post["time"], file_url)
+            p = Post(post["id"], post["content"], user_list[post["poster"]], post["time"], file_url)
             post_list.append(p)
         return post_list
 
@@ -54,15 +54,21 @@ class PostDAO:
             return None
         return File(result[0], result[1])
     
+
     def get_post_file_url(self, post_id):
+        file_info = self.get_post_file(post_id)
+        if file_info != None:
+            return f"/file/{file_info[0]}/{file_info[1]}"
+        return None
+
+    def get_post_file(self, post_id):
         sql = "SELECT A.id, A.name FROM files A, file_to_post B WHERE B.post_id=:post" \
         " AND B.file_id=A.id AND A.is_deleted is not TRUE"
         result = self.__db.session.execute(sql, {"post":post_id}).fetchone()
         if result == None:
             return None
-        return f"/file/{result[0]}/{result[1]}"
-
-
+        return (result[0], result[1])
+        
     def get_topic_by_id(self, topic_id):
         sql = "SELECT id, name, is_deleted FROM topics WHERE id=:id"
         result = self.__db.session.execute(sql, {"id":topic_id})
@@ -80,4 +86,14 @@ class PostDAO:
     def delete_topic(self, topic_id):
         sql = "UPDATE topics SET is_deleted=TRUE WHERE id=:id"
         self.__db.session.execute(sql, {"id":topic_id})
+        self.__db.session.commit()
+
+    def delete_post(self, post_id):
+        file_info = self.get_post_file(post_id)
+        sql = "UPDATE posts SET is_deleted=TRUE WHERE id=:post_id"
+        sql2 = "UPDATE files SET is_deleted=TRUE WHERE id=:file_id"
+
+        self.__db.session.execute(sql, {"post_id":post_id})
+        if file_info != None:
+            self.__db.session.execute(sql2, {"file_id":file_info[0]})
         self.__db.session.commit()
