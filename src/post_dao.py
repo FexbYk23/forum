@@ -63,6 +63,9 @@ class PostDAO:
             return None
         return File(result[0], result[1])
     
+    
+    def is_file_thread_deleted(self, file_id):
+        sql = "SELECT"
 
     def get_post_file_url(self, post_id):
         file_info = self.get_post_file(post_id)

@@ -72,16 +72,17 @@ def view_topic(topic_id):
     threads = thread_db.get_thread_list(topic_id)
     username = session.get_user_id() #name would be better
     topic = PostDAO(db).get_topic_by_id(topic_id)
+    is_admin = user.is_user_admin(session.get_session_user())
     if topic == None:
         return display_error("Virheellinen keskustelualue!","")
-    return render_template("topic.html", threads=threads, topic_id=topic_id, username = username, topic_name = topic.name)
+    return render_template("topic.html", threads=threads, topic_id=topic_id, username = username, topic_name = topic.name, is_admin=is_admin)
 
 
 @app.route("/thread/<int:thread_id>")
 def view_thread(thread_id):
     dao = PostDAO(db)
     posts = dao.get_posts_by_thread(thread_id)
-    if len(posts) == 0:
+    if len(posts) == 0 or thread_db.get_thread(thread_id).is_deleted:
         return display_error("Virheellinen keskusteluketju!", "")
     
     username = session.get_session_user()
@@ -156,7 +157,7 @@ def create_topic():
 @app.route("/file/<int:id>/<string:filename>")
 def view_file(id, filename):
     file = PostDAO(db).get_file(id)
-    if file == None:
+    if file == None or PostDAO(db).is_file_thread_deleted(id):
         return display_error("Virheellinen tiedosto", "hakemaasi tiedostoa ei ole olemassa")
     response = make_response(file.data)
     response.headers.set("Content-Type", file.get_mimetype())
@@ -175,3 +176,9 @@ def delete_post(id):
     else:
         abort(403)
 
+@app.route("/delete_thread/<int:id>", methods=["POST"])
+def delete_thread(id):
+    verify_csrf()
+    verify_user_is_admin()
+    thread_db.delete_thread(id)
+    return redirect("/")

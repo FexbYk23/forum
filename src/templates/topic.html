@@ -10,6 +10,13 @@
 <p>{{ thread.name }}</p>
 </a>
 <p>Viestejä: {{ thread.post_count }}</p>
+{% if is_admin %}
+<form action="/delete_thread/{{ thread.id }}" method="POST">
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+	<input type="submit" value="Poista keskusteluketju">
+</form>
+
+{% endif %}
 {% endfor %}
 
 
