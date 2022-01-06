@@ -8,10 +8,20 @@ class PostDAO:
 
     def __init__(self, db):
         self.__db = db
+    
+    def __create_post_object(self, db_fetched, user_list):
+        post = db_fetched
+        file_url = self.get_post_file_url(post["id"])
+        return Post(post["id"], post["content"], user_list[post["poster"]], post["time"], file_url, post["thread"])
+            
+    def get_post(self, post_id):
+        sql = "SELECT * FROM posts WHERE id=:post_id"
+        result = self.__db.session.execute(sql, {"post_id":post_id})
+        post = result.fetchone()
+        user_list = get_user_list()
+        return self.__create_post_object(post, user_list)
 
     def get_posts_by_thread(self, thread_id):
-        """Returns a list of Post objects in thread"""
-
         sql = "SELECT * FROM posts WHERE thread=:thread_id and is_deleted is not TRUE"
         result = self.__db.session.execute(sql, {"thread_id":thread_id})
         posts = result.fetchall()
@@ -19,8 +29,7 @@ class PostDAO:
         user_list = get_user_list()
 
         for post in posts:
-            file_url = self.get_post_file_url(post["id"])
-            p = Post(post["id"], post["content"], user_list[post["poster"]], post["time"], file_url)
+            p = self.__create_post_object(post, user_list)
             post_list.append(p)
         return post_list
 

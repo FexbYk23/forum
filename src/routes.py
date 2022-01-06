@@ -165,7 +165,13 @@ def view_file(id, filename):
 
 @app.route("/delete_post/<int:id>", methods=["POST"])
 def delete_post(id):
-    print("deleting", id)
-    PostDAO(db).delete_post(id)
-    return redirect("/")
+    verify_csrf()
+    username = session.get_session_user()
+    is_admin = user.is_user_admin(username)
+    post = PostDAO(db).get_post(id)
+    if post.poster == username or is_admin:
+        PostDAO(db).delete_post(id)
+        return redirect("/thread/" + str(post.thread))
+    else:
+        abort(403)
 
