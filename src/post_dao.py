@@ -65,7 +65,11 @@ class PostDAO:
     
     
     def is_file_thread_deleted(self, file_id):
-        sql = "SELECT"
+        sql = "SELECT T.is_deleted FROM " \
+        "Threads T,Files F, file_to_post A, posts P " \
+        "WHERE A.post_id=P.id AND A.file_id=F.id AND T.id=P.thread AND F.id=:file_id"
+        return self.__db.session.execute(sql, {"file_id":file_id}).fetchone()
+
 
     def get_post_file_url(self, post_id):
         file_info = self.get_post_file(post_id)
