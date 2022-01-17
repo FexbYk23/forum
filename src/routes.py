@@ -98,6 +98,7 @@ def view_thread(thread_id):
     return render_template("thread.html",  posts=posts, thread_name=thread_name, thread_id=thread_id,
             topic=topic, logged_in=logged_in, user=username)
 
+
 @app.route("/create_post/<int:thread_id>", methods=["POST"])
 def post_in_thread(thread_id):
     verify_csrf()
@@ -114,9 +115,11 @@ def post_in_thread(thread_id):
         return display_error(valid[1], "")
 
     if len(filedata) > 0:
-        dao.create_post_with_file(thread_id, message, user_id, file.filename, filedata)
+        PostDAO(db).create_post_with_file(thread_id, message, user_id, file.filename, filedata)
     else:
-        dao.create_post(thread_id, message, user_id)
+        PostDAO(db).create_post(thread_id, message, user_id)
+
+
     return redirect("/thread/" + str(thread_id))
 
 @app.route("/create_thread/<int:topic_id>", methods=["POST"])
@@ -126,6 +129,7 @@ def create_new_thread(topic_id):
     thread_name = request.form["thread_name"]
     message = request.form["message"]
     user_id = session.get_user_id()
+    file = request.files["post_file"]
     
     post_valid = input_validation.is_post_valid(user_id, message)
     if not post_valid[0]:
@@ -134,8 +138,18 @@ def create_new_thread(topic_id):
     thread_valid = input_validation.is_thread_name_valid(thread_name)
     if not thread_valid[0]:
         return display_error(thread_valid[1],"")
+    
+    filedata = file.read()
+    if len(filedata) > 1024*1024:
+        return display_error("Tiedosto on liian suuri", "Tiedosto saa olla enintään 1MB kokoinen")
+    
+    thread_id = thread_db.create_thread(topic_id, thread_name)
 
-    thread_id = thread_db.create_thread_with_post(thread_name, message, user_id, topic_id)
+    if len(filedata) > 0:
+        PostDAO(db).create_post_with_file(thread_id, message, user_id, file.filename, filedata)
+    else:
+        PostDAO(db).create_post(thread_id, message, user_id)
+
     return redirect("/thread/" + str(thread_id))
 
 
@@ -159,7 +173,6 @@ def create_topic():
 def view_file(id, filename):
     file = PostDAO(db).get_file(id)
     if file == None or PostDAO(db).is_file_thread_deleted(id):
-        print(file, "\n", PostDAO(db).is_file_thread_deleted(id))
         return display_error("Virheellinen tiedosto", "hakemaasi tiedostoa ei ole olemassa")
     response = make_response(file.data)
     response.headers.set("Content-Type", file.get_mimetype())
