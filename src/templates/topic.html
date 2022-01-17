@@ -16,6 +16,7 @@
 {% if is_admin %}
 <form action="/delete_thread/{{ thread.id }}" method="POST">
 	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+	<input type="hidden" name="redirect" value="{{ request.path }}">
 	<input type="submit" value="Poista keskusteluketju">
 </form>
 

@@ -20,7 +20,7 @@ def verify_user_is_admin():
     if not user.is_user_admin(session.get_session_user()):
         abort(403)
 
-def login_redirect():
+def return_redirect():
         return redirect(request.form.get("redirect", "/"))
 
 
@@ -52,12 +52,12 @@ def register():
 
 
 @app.route("/login", methods=["POST"])
-def login_redirect_page():
+def return_redirect_page():
     username = request.form["username"]
     passw = request.form["password"]
     if user.check_user_credentials(username, passw):
         session.login_as(username)
-        return login_redirect()
+        return return_redirect()
     return display_error("Kirjautuminen epäonnistui",
             "Väärä käyttäjänimi tai salasana")
 
@@ -65,7 +65,7 @@ def login_redirect_page():
 @app.route("/logout")
 def logout():
     session.end_session()
-    return login_redirect()
+    return return_redirect()
 
 @app.route("/topics/<int:topic_id>")
 def view_topic(topic_id):
@@ -196,4 +196,4 @@ def delete_thread(id):
     verify_csrf()
     verify_user_is_admin()
     thread_db.delete_thread(id)
-    return redirect("/")
+    return return_redirect()
