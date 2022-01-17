@@ -4,17 +4,31 @@ textarea {
 
 #post-body {
 	padding: 10px 10px;
-	background-color: #E0E0E0;
-	border: 3px solid black;
+	background-color: #F0F0F0;
+	border: 2px solid #808080;
 	width: 90vw;
 }
 
 #post-header {
 	padding: 5px 5px;
-	background-color: #D0D0E0;
+	background-color: #E0E0E0;
+	text-align: center;
+
 }
 
 #post-msg {
 	word-wrap: break-word;
+}
+
+#thread-box {
+	margin: 5px 5px;
+	padding: 10px 40px;
+	background-color: #E0E0E0;
+}
+
+#login {
+	padding: 5px 5px;
+	background-color: #E0E0E0;
+	width: 240px;
 }
 

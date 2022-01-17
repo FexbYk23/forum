@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/static/style.css">
 <title>Ketjut</title>
 
 <a href="/">Etusivu</a> /
@@ -6,6 +7,8 @@
 <h2>Keskustelut:</h2>
 
 {% for thread in threads %}
+<div id="thread-box">
+
 <a href="/thread/{{thread.id}}"
 <p>{{ thread.name }}</p>
 </a>
@@ -17,10 +20,12 @@
 </form>
 
 {% endif %}
+
+</div>
 {% endfor %}
 
-
-{% if username != None %}
+<hr>
+{% if user != None %}
 <h2>Uusi keskusteluketju</h2>
 <form action="/create_thread/{{topic_id}}" method="post">
 	Otsikko:
@@ -35,4 +40,5 @@
 </form>
 {% else %}
 <p>Kirjaudu sisään luodaksesi keskusteluketjuja.</p>
+{% include "login_box.html" %}
 {% endif %}

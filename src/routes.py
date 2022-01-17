@@ -20,6 +20,10 @@ def verify_user_is_admin():
     if not user.is_user_admin(session.get_session_user()):
         abort(403)
 
+def login_redirect():
+        return redirect(request.form.get("redirect", "/"))
+
+
 @app.route("/")
 def index():
     username = session.get_session_user()
@@ -48,34 +52,31 @@ def register():
 
 
 @app.route("/login", methods=["POST"])
-def login_redirect():
+def login_redirect_page():
     username = request.form["username"]
     passw = request.form["password"]
     if user.check_user_credentials(username, passw):
         session.login_as(username)
-        return redirect("/")
-    return redirect("/login_fail")
+        return login_redirect()
+    return display_error("Kirjautuminen epäonnistui",
+            "Väärä käyttäjänimi tai salasana")
 
 
 @app.route("/logout")
 def logout():
     session.end_session()
-    return redirect("/")
-
-@app.route("/login_fail")
-def login_failed():
-    return display_error("Kirjautuminen epäonnistui", "Väärä käyttäjänimi tai salasana")
-
+    return login_redirect()
 
 @app.route("/topics/<int:topic_id>")
 def view_topic(topic_id):
     threads = thread_db.get_thread_list(topic_id)
-    username = session.get_user_id() #name would be better
+    username = session.get_session_user()
     topic = PostDAO(db).get_topic_by_id(topic_id)
     is_admin = user.is_user_admin(session.get_session_user())
     if topic == None:
         return display_error("Virheellinen keskustelualue!","")
-    return render_template("topic.html", threads=threads, topic_id=topic_id, username = username, topic_name = topic.name, is_admin=is_admin)
+    return render_template("topic.html", threads=threads, topic_id=topic_id,
+            user = username, topic_name = topic.name, is_admin=is_admin)
 
 
 @app.route("/thread/<int:thread_id>")
@@ -95,7 +96,7 @@ def view_thread(thread_id):
     topic = thread_db.get_thread_topic(thread_id)
     logged_in = session.get_session_user() != None
     return render_template("thread.html",  posts=posts, thread_name=thread_name, thread_id=thread_id,
-            topic=topic, logged_in=logged_in)
+            topic=topic, logged_in=logged_in, user=username)
 
 @app.route("/create_post/<int:thread_id>", methods=["POST"])
 def post_in_thread(thread_id):
@@ -158,6 +159,7 @@ def create_topic():
 def view_file(id, filename):
     file = PostDAO(db).get_file(id)
     if file == None or PostDAO(db).is_file_thread_deleted(id):
+        print(file, "\n", PostDAO(db).is_file_thread_deleted(id))
         return display_error("Virheellinen tiedosto", "hakemaasi tiedostoa ei ole olemassa")
     response = make_response(file.data)
     response.headers.set("Content-Type", file.get_mimetype())

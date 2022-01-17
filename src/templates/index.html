@@ -1,31 +1,10 @@
 <link rel="stylesheet" href="/static/style.css">
-<title>Kirjaudu sisään</title>
-
-{% if user == None %}
-<p><b>Kirjaudu sisään:</b></p>
-
-<form action="/login" method="POST">
-	Nimi:
-	<input type="text" name="username">
-	<br>
-	Salasana:
-	<input type="text" name="password">
-	<br>
-	<input type="submit" value="Kirjaudu">
-</form>
-
-<form action="/register" method="GET">
-	<input type="submit" value="Rekisteröidy">
-</form>
-
-{% else %}
-<p>Tervetuloa {{ user }}</p>
-<a href="/logout"><p>Kirjaudu ulos</p></a>
-{% endif %}
+{% include "login_box.html" %}
 
 <h2>Keskustelualueet:</h2>
 
 {% for topic in topics %}
+<div id="thread-box">
 <a href="/topics/{{ topic.id }}"><p><b>{{ topic.name }}</b></p></a>
 <p><i>{{ topic.description }}</i></p>
 
@@ -35,7 +14,7 @@
 	<input type="submit" value="Poista">
 </form>
 {% endif %}
-
+</div>
 {% endfor %}
 
 

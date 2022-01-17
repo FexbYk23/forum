@@ -10,7 +10,6 @@
 
 
 <p><h1>{{ thread_name }}</h1></p>
-
 {% for post in posts %}
 <div id="post-body">
 	<p id="post-header">
@@ -26,16 +25,16 @@
 	<p id="post-msg">{{ post.content }}</p>
 
 	{% if post.file != None %}
+		<br>
 		<p>
 			<i>
-				<a href="{{ post.file }}">Lataa liitetiedosto</a>
+				<a href="{{ post.file }}">Avaa liitetiedosto</a>
 			</i>
 		</p>
 	{% endif %}
 </div>
 <br>
 {% endfor %}
-
 
 {% if logged_in %}
 <h2>Uusi viesti</h2>
@@ -53,4 +52,5 @@
 </form>
 {% else %}
 <p>Osallistu keskusteluun kirjautumalla sisään.</p>
+{% include "login_box.html" %}
 {% endif %}

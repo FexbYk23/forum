@@ -21,7 +21,10 @@ def check_csrf_token(token):
     return token == session["csrf_token"]
 
 def end_session():
-    del session["username"]
-    del session["user_id"]
-    del session["csrf_token"]
+    try:
+        del session["username"]
+        del session["user_id"]
+        del session["csrf_token"]
+    except:
+        pass
 
