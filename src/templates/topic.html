@@ -13,6 +13,13 @@
 <p>{{ thread.name }}</p>
 </a>
 <p>Viestejä: {{ thread.post_count }}</p>
+
+<p>
+Uusin viesti:
+{{ thread.latest_post.time }} Käyttäjältä
+<b>{{ thread.latest_post.poster }}</b>
+</p>
+
 {% if is_admin %}
 <form action="/delete_thread/{{ thread.id }}" method="POST">
 	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">

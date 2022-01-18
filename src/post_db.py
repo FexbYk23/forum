@@ -29,6 +29,13 @@ def get_posts_by_thread(thread_id):
 		post_list.append(p)
 	return post_list
 
+def get_latest_post(thread_id):
+	sql = "SELECT A.id, A.content, B.name, A.time, A.thread FROM posts A, users B"\
+	" WHERE A.poster=B.id AND A.thread=:tid AND A.is_deleted is not TRUE"\
+	" ORDER BY time DESC LIMIT 1"
+	result = db.session.execute(sql, {"tid":thread_id}).fetchone()
+	return Post(result[0], result[1], result[2], result[3], "", result[4])
+
 def create_post(thread_id, post_text, user_id, file_id):
 	sql = "INSERT INTO posts VALUES (DEFAULT, :text, :user_id, :thread_id, :file_id,  NOW()) RETURNING id"
 	result = db.session.execute(sql, {"text":post_text, "user_id":user_id, "thread_id":thread_id, "file_id":file_id})
