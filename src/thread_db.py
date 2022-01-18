@@ -10,7 +10,8 @@ def get_thread_name(thread_id):
     return result[0]
     
 def get_thread_topic(thread_id):
-    sql = "SELECT A.id, A.name FROM topics A, threads B WHERE B.topic=A.id AND B.id=:thread_id"
+    sql = "SELECT A.id, A.name FROM topics A, threads B" \
+          " WHERE B.topic=A.id AND B.id=:thread_id"
     result = db.session.execute(sql, {"thread_id":thread_id})
     t = result.fetchone()
     return Topic(t[0], t[1])
@@ -22,7 +23,8 @@ def create_thread(topic_id, thread_name):
     return result.fetchone()[0] #ID
 
 def get_thread_post_count(thread_id):
-    sql = "SELECT COUNT(B.id) FROM threads A, posts B WHERE B.is_deleted IS NOT TRUE AND B.thread=A.id AND A.id=:id"
+    sql = "SELECT COUNT(B.id) FROM threads A, posts B"\
+          " WHERE B.is_deleted IS NOT TRUE AND B.thread=A.id AND A.id=:id"
     return db.session.execute(sql, {"id":thread_id}).fetchone()[0]
 
 def get_thread(thread_id):

@@ -9,7 +9,7 @@ def __create_post_object(db_fetched, user_list):
 	post = db_fetched
 	file_url = get_post_file_url(post["id"])
 	return Post(post["id"], post["content"], user_list[post["poster"]], post["time"], file_url, post["thread"])
-		
+
 def get_post(post_id):
 	sql = "SELECT * FROM posts WHERE id=:post_id"
 	result = db.session.execute(sql, {"post_id":post_id})
@@ -29,9 +29,9 @@ def get_posts_by_thread(thread_id):
 		post_list.append(p)
 	return post_list
 
-def create_post(thread_id, post_text, user_id):
-	sql = "INSERT INTO posts VALUES (DEFAULT, :text, :user_id, :thread_id, NOW()) RETURNING id"
-	result = db.session.execute(sql, {"text":post_text, "user_id":user_id, "thread_id":thread_id})
+def create_post(thread_id, post_text, user_id, file_id):
+	sql = "INSERT INTO posts VALUES (DEFAULT, :text, :user_id, :thread_id, :file_id,  NOW()) RETURNING id"
+	result = db.session.execute(sql, {"text":post_text, "user_id":user_id, "thread_id":thread_id, "file_id":file_id})
 	db.session.commit()
 	return result.fetchone()[0] #id
 
@@ -41,16 +41,10 @@ def create_file(filename, filedata):
 	result = db.session.execute(sql, subst)
 	db.session.commit()
 	return result.fetchone()[0]
-			
-def add_file_to_post(post_id, file_id):
-	sql = "INSERT INTO file_to_post VALUES (:file_id, :post_id)"
-	db.session.execute(sql, {"file_id":file_id, "post_id":post_id})
-	db.session.commit()
 
 def create_post_with_file(thread_id, post_text, user_id, filename, filedata):
-	post_id = create_post(thread_id, post_text, user_id)
 	file_id = create_file(filename, filedata)
-	add_file_to_post(post_id, file_id)
+	create_post(thread_id, post_text, user_id, file_id)
 
 def get_file(file_id):
 	sql = "SELECT name,data FROM files WHERE id=:id AND is_deleted is not TRUE"
@@ -62,8 +56,8 @@ def get_file(file_id):
 
 def is_file_thread_deleted(file_id):
 	sql = "SELECT T.is_deleted FROM " \
-	"Threads T,Files F, file_to_post A, posts P " \
-	"WHERE A.post_id=P.id AND A.file_id=F.id AND T.id=P.thread AND F.id=:file_id"
+	"Threads T,Files F, posts P " \
+	"WHERE P.file_id=F.id AND T.id=P.thread AND F.id=:file_id"
 	result = db.session.execute(sql, {"file_id":file_id}).fetchone()
 	return result[0] == True
 
@@ -75,7 +69,7 @@ def get_post_file_url(post_id):
 	return None
 
 def get_post_file(post_id):
-	sql = "SELECT A.id, A.name FROM files A, file_to_post B WHERE B.post_id=:post" \
+	sql = "SELECT A.id, A.name FROM files A, posts B WHERE B.id=:post" \
 	" AND B.file_id=A.id AND A.is_deleted is not TRUE"
 	result = db.session.execute(sql, {"post":post_id}).fetchone()
 	if result == None:

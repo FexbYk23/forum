@@ -116,7 +116,7 @@ def post_in_thread(thread_id):
     if len(filedata) > 0:
         post_db.create_post_with_file(thread_id, message, user_id, file.filename, filedata)
     else:
-        post_db.create_post(thread_id, message, user_id)
+        post_db.create_post(thread_id, message, user_id, None)
 
 
     return redirect("/thread/" + str(thread_id))
@@ -147,7 +147,7 @@ def create_new_thread(topic_id):
     if len(filedata) > 0:
         post_db.create_post_with_file(thread_id, message, user_id, file.filename, filedata)
     else:
-        post_db.create_post(thread_id, message, user_id)
+        post_db.create_post(thread_id, message, user_id, None)
 
     return redirect("/thread/" + str(thread_id))
 

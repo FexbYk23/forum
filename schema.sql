@@ -25,6 +25,7 @@ CREATE TABLE posts (
 	content TEXT,
 	poster INTEGER REFERENCES users,
 	thread INTEGER REFERENCES threads,
+	file_id INTEGER REFERENCES files,
 	time TIMESTAMP,
 	is_deleted BOOLEAN
 );
@@ -36,7 +37,3 @@ CREATE TABLE files (
 	is_deleted BOOLEAN
 );
 
-CREATE TABLE file_to_post (
-	file_id INTEGER REFERENCES files,
-	post_id INTEGER REFERENCES posts
-);

@@ -13,7 +13,7 @@
 {% for post in posts %}
 <div id="post-body">
 	<p id="post-header">
-		{{ post.poster }} @ {{ post.time }}
+	<b>	{{ post.poster }}</b> @ {{ post.time }}
 		
 		{% if post.can_delete %}
 		<form action="/delete_post/{{ post.id }}" method="POST">
