@@ -1,7 +1,6 @@
 from db import db
 from domain.thread import Thread
 from domain.topic import Topic
-from post_dao import PostDAO
 
 def get_thread_name(thread_id):
     sql = "SELECT name FROM threads WHERE id=:id"
@@ -21,11 +20,6 @@ def create_thread(topic_id, thread_name):
     result = db.session.execute(sql, {"thread_name":thread_name, "topic_id":topic_id})
     db.session.commit()
     return result.fetchone()[0] #ID
-
-def create_thread_with_post(thread_name, post_text, user_id, topic_id):
-    thread_id = create_thread(topic_id, thread_name)
-    PostDAO(db).create_post(thread_id, post_text, user_id)
-    return thread_id
 
 def get_thread_post_count(thread_id):
     sql = "SELECT COUNT(B.id) FROM threads A, posts B WHERE B.is_deleted IS NOT TRUE AND B.thread=A.id AND A.id=:id"

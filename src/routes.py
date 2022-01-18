@@ -2,11 +2,12 @@ from app import app
 from db import db
 from flask import redirect, render_template, request, session, abort, make_response
 from flask_sqlalchemy import SQLAlchemy
-from post_dao import PostDAO
+
 
 import user
 import session
 import thread_db
+import post_db
 import input_validation
 
 def display_error(desc, msg):
@@ -71,7 +72,7 @@ def logout():
 def view_topic(topic_id):
     threads = thread_db.get_thread_list(topic_id)
     username = session.get_session_user()
-    topic = PostDAO(db).get_topic_by_id(topic_id)
+    topic = post_db.get_topic_by_id(topic_id)
     is_admin = user.is_user_admin(session.get_session_user())
     if topic == None:
         return display_error("Virheellinen keskustelualue!","")
@@ -81,8 +82,7 @@ def view_topic(topic_id):
 
 @app.route("/thread/<int:thread_id>")
 def view_thread(thread_id):
-    dao = PostDAO(db)
-    posts = dao.get_posts_by_thread(thread_id)
+    posts = post_db.get_posts_by_thread(thread_id)
     if len(posts) == 0 or thread_db.get_thread(thread_id).is_deleted:
         return display_error("Virheellinen keskusteluketju!", "")
     
@@ -102,7 +102,6 @@ def view_thread(thread_id):
 @app.route("/create_post/<int:thread_id>", methods=["POST"])
 def post_in_thread(thread_id):
     verify_csrf()
-    dao = PostDAO(db)
     user_id = session.get_user_id()
     message = request.form["message"]
     file = request.files["post_file"]
@@ -115,9 +114,9 @@ def post_in_thread(thread_id):
         return display_error(valid[1], "")
 
     if len(filedata) > 0:
-        PostDAO(db).create_post_with_file(thread_id, message, user_id, file.filename, filedata)
+        post_db.create_post_with_file(thread_id, message, user_id, file.filename, filedata)
     else:
-        PostDAO(db).create_post(thread_id, message, user_id)
+        post_db.create_post(thread_id, message, user_id)
 
 
     return redirect("/thread/" + str(thread_id))
@@ -146,9 +145,9 @@ def create_new_thread(topic_id):
     thread_id = thread_db.create_thread(topic_id, thread_name)
 
     if len(filedata) > 0:
-        PostDAO(db).create_post_with_file(thread_id, message, user_id, file.filename, filedata)
+        post_db.create_post_with_file(thread_id, message, user_id, file.filename, filedata)
     else:
-        PostDAO(db).create_post(thread_id, message, user_id)
+        post_db.create_post(thread_id, message, user_id)
 
     return redirect("/thread/" + str(thread_id))
 
@@ -157,7 +156,7 @@ def create_new_thread(topic_id):
 def delete_topic(id):
     verify_csrf()
     verify_user_is_admin()
-    PostDAO(db).delete_topic(id)
+    post_db.delete_topic(id)
     return redirect("/")
 
 @app.route("/create_topic", methods=["POST"])
@@ -166,13 +165,13 @@ def create_topic():
     verify_user_is_admin()
     topic_name = request.form["name"]
     topic_description = request.form["desc"]
-    PostDAO(db).create_topic(topic_name, topic_description)
+    post_db.create_topic(topic_name, topic_description)
     return redirect("/")
 
 @app.route("/file/<int:id>/<string:filename>")
 def view_file(id, filename):
-    file = PostDAO(db).get_file(id)
-    if file == None or PostDAO(db).is_file_thread_deleted(id):
+    file = post_db.get_file(id)
+    if file == None or post_db.is_file_thread_deleted(id):
         return display_error("Virheellinen tiedosto", "hakemaasi tiedostoa ei ole olemassa")
     response = make_response(file.data)
     response.headers.set("Content-Type", file.get_mimetype())
@@ -184,9 +183,9 @@ def delete_post(id):
     verify_csrf()
     username = session.get_session_user()
     is_admin = user.is_user_admin(username)
-    post = PostDAO(db).get_post(id)
+    post = post_db.get_post(id)
     if post.poster == username or is_admin:
-        PostDAO(db).delete_post(id)
+        post_db.delete_post(id)
         return redirect("/thread/" + str(post.thread))
     else:
         abort(403)
