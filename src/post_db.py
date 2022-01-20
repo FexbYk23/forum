@@ -91,6 +91,13 @@ def get_topic_by_id(topic_id):
 		return None
 	return Topic(t[0], t[1])
 
+def get_topics():
+	sql = "SELECT T.id, T.name, T.is_deleted, T.description, "\
+                "(SELECT COUNT(A.id) FROM threads A, posts B WHERE A.id=B.thread AND A.topic=T.id AND A.is_deleted IS NOT TRUE)"\
+                " FROM topics T"
+	result = db.session.execute(sql)
+	t = result.fetchall()
+	return [Topic(x[0], x[1], x[3], x[4]) for x in t if not x[2]]
 
 def create_topic(topic_name, topic_desc):
 	sql = "INSERT INTO topics VALUES (DEFAULT, :name, :desc, FALSE)"

@@ -6,7 +6,8 @@
 {% for topic in topics %}
 <div id="thread-box">
 <a href="/topics/{{ topic.id }}"><p><b>{{ topic.name }}</b></p></a>
-<p><i>{{ topic.description }}</i></p>
+<p><i>{{ topic.desc }}</i></p>
+<p>Viestiketjuja: {{ topic.thread_count }}</p>
 
 {% if is_admin %}
 <form action="/delete_topic/{{ topic.id }}" method="POST">

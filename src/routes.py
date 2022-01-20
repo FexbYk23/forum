@@ -28,7 +28,7 @@ def return_redirect():
 @app.route("/")
 def index():
     username = session.get_session_user()
-    topics = db.session.execute("SELECT * FROM topics WHERE is_deleted=FALSE").fetchall()
+    topics = post_db.get_topics()
     return render_template("index.html", user=username, topics=topics, is_admin=user.is_user_admin(username))
 
 
@@ -92,6 +92,7 @@ def view_thread(thread_id):
     for post in posts:
         if post.poster == username or is_admin:
             post.can_delete = True
+    posts[0].can_delete = is_admin # only admin can delete first post in thread
     thread_name = thread_db.get_thread_name(thread_id)
     topic = thread_db.get_thread_topic(thread_id)
     logged_in = session.get_session_user() != None

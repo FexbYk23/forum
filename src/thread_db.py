@@ -40,7 +40,7 @@ def get_thread_list(topic_id):
     "(SELECT COUNT(P.id) FROM posts P WHERE P.thread=T.id AND P.is_deleted IS NOT TRUE)"\
     "FROM threads T WHERE topic=:topic AND T.is_deleted IS NOT TRUE"
     result = db.session.execute(sql, {"topic":topic_id}).fetchall()
-    return [Thread(x[0], x[1], x[3], x[2], post_db.get_latest_post(x[0])) for x in result if x[3] > 0]
+    return [Thread(x[0], x[1], x[3], x[2], post_db.get_latest_post(x[0])) for x in result]
 
 def delete_thread(thread_id):
     sql = "UPDATE threads SET is_deleted=TRUE WHERE id=:tid"
