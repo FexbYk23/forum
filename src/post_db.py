@@ -95,7 +95,7 @@ def get_topic_by_id(topic_id):
 
 def get_topics():
 	sql = "SELECT T.id, T.name, T.is_deleted, T.description, "\
-                "(SELECT COUNT(A.id) FROM threads A, posts B WHERE A.id=B.thread AND A.topic=T.id AND A.is_deleted IS NOT TRUE)"\
+                "(SELECT COUNT(A.id) FROM threads A WHERE A.topic=T.id AND A.is_deleted IS NOT TRUE)"\
                 " FROM topics T"
 	result = db.session.execute(sql)
 	t = result.fetchall()
