@@ -1,7 +1,7 @@
-from db import db
+from db.db import db
 from domain.thread import Thread
 from domain.topic import Topic
-import post_db
+import db.post_db as post_db
 
 def get_thread_name(thread_id):
     sql = "SELECT name FROM threads WHERE id=:id"

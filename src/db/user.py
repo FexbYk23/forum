@@ -1,5 +1,5 @@
 from werkzeug.security import check_password_hash, generate_password_hash
-from db import db
+from db.db import db
 
 
 def does_user_exist(username):

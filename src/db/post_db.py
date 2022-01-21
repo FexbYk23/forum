@@ -2,8 +2,8 @@ from domain.post import Post
 from domain.topic import Topic
 from domain.thread import Thread
 from domain.file import File
-from user import get_user_list
-from db import db
+from db.user import get_user_list
+from db.db import db
 
 def __create_post_object(db_fetched, user_list):
 	post = db_fetched
@@ -64,11 +64,11 @@ def get_file(file_id):
 
 
 def is_file_thread_deleted(file_id):
-	sql = "SELECT T.is_deleted FROM " \
+	sql = "SELECT 1 FROM " \
 	"Threads T,Files F, posts P " \
-	"WHERE P.file_id=F.id AND T.id=P.thread AND F.id=:file_id"
+	"WHERE P.file_id=F.id AND T.id=P.thread AND F.id=:file_id AND T.is_deleted IS NOT TRUE"
 	result = db.session.execute(sql, {"file_id":file_id}).fetchone()
-	return result[0] == True
+	return result == None
 
 
 def get_post_file_url(post_id):

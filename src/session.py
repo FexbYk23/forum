@@ -1,5 +1,5 @@
 from flask import session
-from user import get_user_id as get_user_db_id
+from db.user import get_user_id as get_user_db_id
 import secrets
 
 def login_as(username):

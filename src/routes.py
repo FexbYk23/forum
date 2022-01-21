@@ -1,28 +1,28 @@
 from app import app
-from db import db
+from db.db import db
 from flask import redirect, render_template, request, session, abort, make_response
 from flask_sqlalchemy import SQLAlchemy
+from route_util import display_error, verify_csrf, verify_user_is_admin, return_redirect
 
-
-import user
+import db.user as user
 import session
-import thread_db
-import post_db
+import db.thread_db as thread_db
+import db.post_db as post_db
 import input_validation
 
-def display_error(desc, msg):
-    return render_template("error.html", error_name=desc, error_msg=msg)
+#def display_error(desc, msg):
+#    return render_template("error.html", error_name=desc, error_msg=msg)
 
-def verify_csrf():
-    if not session.check_csrf_token(request.form["csrf_token"]):
-        abort(403)
+#def verify_csrf():
+ #   if not session.check_csrf_token(request.form["csrf_token"]):
+ #       abort(403)
 
-def verify_user_is_admin():
-    if not user.is_user_admin(session.get_session_user()):
-        abort(403)
+#def verify_user_is_admin():
+  #  if not user.is_user_admin(session.get_session_user()):
+ #       abort(403)
 
-def return_redirect():
-        return redirect(request.form.get("redirect", "/"))
+#def return_redirect():
+    #    return redirect(request.form.get("redirect", "/"))
 
 
 @app.route("/")
@@ -178,7 +178,6 @@ def view_file(id, filename):
     response.headers.set("Content-Type", file.get_mimetype())
     return response
 
-
 @app.route("/delete_post/<int:id>", methods=["POST"])
 def delete_post(id):
     verify_csrf()
@@ -197,3 +196,4 @@ def delete_thread(id):
     verify_user_is_admin()
     thread_db.delete_thread(id)
     return return_redirect()
+
