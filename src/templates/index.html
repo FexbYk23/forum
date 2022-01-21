@@ -1,5 +1,7 @@
-<link rel="stylesheet" href="/static/style.css">
-{% include "login_box.html" %}
+
+{% extends "layout.html" %}
+
+{% block content %}
 
 <h2>Keskustelualueet:</h2>
 
@@ -33,3 +35,4 @@
 </form>
 {% endif %}
 
+{% endblock %}

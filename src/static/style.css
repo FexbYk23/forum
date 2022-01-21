@@ -2,6 +2,19 @@ textarea {
 	resize: none;
 }
 
+#titlebar {
+	height: 220px;
+	padding: 0px 100px;
+	background-color: #F04040;
+}
+
+#title-text{
+	color: #FFFFFF;
+	margin: 70px 0px;
+	font-size: 50px;
+	float: left;
+}
+
 #post-body {
 	padding: 10px 10px;
 	background-color: #F0F0F0;
@@ -27,8 +40,20 @@ textarea {
 }
 
 #login {
-	padding: 5px 5px;
+	display: block;
+	float: right;
+	padding: 5px 20px;
+	background-color: #FFB0A0;
+	width: 240px;
+	height: 210px;
+}
+
+
+#register-box {
+	padding: 5px 20px;
+	margin: 10px auto;
 	background-color: #E0E0E0;
 	width: 240px;
 }
+
 

@@ -49,7 +49,7 @@ def register():
         return display_error("Rekisteröityminen epäonnistui", "nimi on jo käytössä")
     
     elif request.method == "GET":
-        return render_template("register.html")
+        return render_template("register.html", user=None)
 
 
 @app.route("/login", methods=["POST"])
@@ -63,7 +63,7 @@ def return_redirect_page():
             "Väärä käyttäjänimi tai salasana")
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
 def logout():
     session.end_session()
     return return_redirect()

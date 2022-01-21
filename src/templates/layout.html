@@ -1,0 +1,44 @@
+<!doctype>
+<link rel="stylesheet" href="/static/style.css">
+
+<div id="titlebar">
+	<a href="/"><h1 id="title-text">Forum</h1></a>
+
+
+{% if user == None %}
+
+<div id="login">
+
+<p><b>Kirjaudu sisään:</b></p>
+
+<form action="/login" method="POST">
+        Nimi:
+        <input type="text" name="username">
+        <br>
+        Salasana:
+        <input type="text" name="password">
+        <br>
+        <input type="hidden" name="redirect" value="{{ request.path }}">
+        <input type="submit" value="Kirjaudu">
+</form>
+
+<form action="/register" method="GET">
+        <input type="submit" value="Rekisteröidy">
+</form>
+</div>
+{% else %}
+<div id="login">
+
+        <p>Olet kirjautunut käyttäjänä <b>{{ user }}</b></p>
+        <form action="/logout" method="POST">
+                <input type="hidden" name="redirect" value="{{ request.path }}">
+                <input type="submit" value="Kirjaudu ulos">
+        </form>
+</div>
+{% endif %}
+
+</div>
+
+
+<br>
+{% block content %}{% endblock %}

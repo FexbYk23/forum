@@ -1,4 +1,5 @@
-<link rel="stylesheet" href="/static/style.css">
+{% extends "layout.html" %}
+{% block content %}
 <title>Ketjut</title>
 
 <a href="/">Etusivu</a> /
@@ -51,5 +52,6 @@ Uusin viesti:
 </form>
 {% else %}
 <p>Kirjaudu sisään luodaksesi keskusteluketjuja.</p>
-{% include "login_box.html" %}
 {% endif %}
+
+{% endblock %}
