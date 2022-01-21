@@ -16,9 +16,9 @@ def get_user_id(username):
     return result[0]
 
 def get_user_list():
-    sql = "SELECT name FROM users"
+    sql = "SELECT id,name FROM users"
     result = db.session.execute(sql).fetchall()
-    return [x[0] for x in result]
+    return {x[0]:x[1] for x in result}
 
 def check_user_credentials(username, password_hash):
     sql = "SELECT password_hash FROM users WHERE name=:username"

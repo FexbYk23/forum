@@ -20,6 +20,13 @@ CREATE TABLE threads (
 	is_deleted BOOLEAN
 );
 
+CREATE TABLE files (
+	id SERIAL PRIMARY KEY,
+	name TEXT,
+	data BYTEA,
+	is_deleted BOOLEAN
+);
+
 CREATE TABLE posts (
 	id SERIAL PRIMARY KEY,
 	content TEXT,
@@ -27,13 +34,6 @@ CREATE TABLE posts (
 	thread INTEGER REFERENCES threads,
 	file_id INTEGER REFERENCES files,
 	time TIMESTAMP,
-	is_deleted BOOLEAN
-);
-
-CREATE TABLE files (
-	id SERIAL PRIMARY KEY,
-	name TEXT,
-	data BYTEA,
 	is_deleted BOOLEAN
 );
 

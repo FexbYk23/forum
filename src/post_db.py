@@ -34,6 +34,8 @@ def get_latest_post(thread_id):
 	" WHERE A.poster=B.id AND A.thread=:tid AND A.is_deleted is not TRUE"\
 	" ORDER BY time DESC LIMIT 1"
 	result = db.session.execute(sql, {"tid":thread_id}).fetchone()
+	if result == None: #no posts
+		return None
 	return Post(result[0], result[1], result[2], result[3], "", result[4])
 
 def create_post(thread_id, post_text, user_id, file_id):
