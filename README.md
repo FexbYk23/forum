@@ -1,8 +1,6 @@
 # Forum
 Tämä repositorio sisältää yksinkertaisen keskustelupalstasivuston. Sivustolla on keskusteluaiheita, joiden sisälle voi luoda keskusteluketjuja, joihin voi lähettää viestejä. Viesteissä voi olla mukana liitetiedostoja. Sivustolle on kirjauduttava, jotta voi luoda keskusteluketjuja ja lähettää viestejä. Käyttäjä voi poistaa itse lähettämiään viestejä ja ylläpitäjät voivat poistaa kaikkien viestejä, keskusteluketjuja sekä keskusteluaiheita.
 
-Sovellusta voi kokeilla [Heroku-palvelussa](https://glacial-retreat-70819.herokuapp.com/).
-
 
 ## Asennus
 Olettaen että sinulla on asennettuna Python ja PostgreSQL, voit asentaa sovelluksen komennoilla:  
